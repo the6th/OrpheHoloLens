@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 1191042345}
   - component: {fileID: 1191042344}
   - component: {fileID: 1191042347}
+  - component: {fileID: 1191042348}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -259,7 +260,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1191042342}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_MotionVectors: 1
@@ -317,6 +318,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UITextPrefab: {fileID: 1182869508273004, guid: f4eb295d49c38404999fd338be3ffd24,
     type: 2}
+--- !u!114 &1191042348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1191042342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f5bbb2a3bd81b84a86403ceb6628078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1673171378
 Prefab:
   m_ObjectHideFlags: 0

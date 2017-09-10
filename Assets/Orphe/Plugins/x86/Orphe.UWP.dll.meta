@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 39a8c60ffe97be749872313e47cff408
-timeCreated: 1500973863
+timeCreated: 1504970856
 licenseType: Free
 PluginImporter:
   serializedVersion: 2
@@ -45,12 +45,13 @@ PluginImporter:
       second:
         enabled: 0
         settings:
+          CPU: x86
           DefaultValueInitialized: true
     data:
       first:
         Facebook: Win
       second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: AnyCPU
     data:
@@ -66,7 +67,7 @@ PluginImporter:
       second:
         enabled: 0
         settings:
-          CPU: None
+          CPU: x86
     data:
       first:
         Standalone: Linux64
@@ -87,7 +88,7 @@ PluginImporter:
       second:
         enabled: 0
         settings:
-          CPU: None
+          CPU: AnyCPU
     data:
       first:
         Standalone: OSXIntel64
@@ -126,7 +127,7 @@ PluginImporter:
           DontProcess: False
           PlaceholderPath: 
           SDK: UWP
-          ScriptingBackend: AnyScriptingBackend
+          ScriptingBackend: DotNet
   userData: 
   assetBundleName: 
   assetBundleVariant: 

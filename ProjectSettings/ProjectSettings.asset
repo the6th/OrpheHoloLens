@@ -504,7 +504,8 @@ PlayerSettings:
   scriptingBackend: {}
   incrementalIl2cppBuild: {}
   additionalIl2CppArgs: 
-  apiCompatibilityLevelPerPlatform: {}
+  apiCompatibilityLevelPerPlatform:
+    Metro: 2
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: OrpheHoloLens
