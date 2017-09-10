@@ -20,11 +20,10 @@ namespace Orpe
 {
     public class OrpheDeviceManager : Singleton<OrpheDeviceManager>
     {
-        public Quaternion deviceQ;
+
+        public bool isConnected = false;
 
 #if WINDOWS_UWP
-
-        bool isConnected = false;
         // delegateの宣言
         public delegate void MyCallback(string msg);
         public delegate void MyValueCallback(OrpheValueChangedEventArgs e);
@@ -119,6 +118,14 @@ namespace Orpe
             if (isConnected)
             {
                 Debug.Log("すでに接続済み");
+                Task.Run(async () =>
+                {
+                    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                    {
+                        OnConnectFailed(deviceID);
+                    }, true);
+
+                });
                 return;
             }
                 
@@ -147,6 +154,7 @@ namespace Orpe
             _DeviceWatcher.Stop();
 
             Debug.Log("Connected!");
+            isConnected = true;
             Task.Run(async () =>
             {
                 UnityEngine.WSA.Application.InvokeOnAppThread(() =>
@@ -161,9 +169,7 @@ namespace Orpe
 
         private void OrpheShoe_ValueChanged(object sender, OrpheValueChangedEventArgs e)
         {
-            Debug.Log("OrpheShoe_ValueChanged");
-            deviceQ = new Quaternion((float)e.Quaternion.x, (float)e.Quaternion.y, (float)e.Quaternion.z, (float)e.Quaternion.w);
-            
+         //SS  Debug.Log("OrpheShoe_ValueChanged" + sender.ToString());
 
             Task.Run(async () =>
             {

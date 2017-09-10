@@ -33,9 +33,12 @@ namespace Orpe
 
 
             axis.Add(AxisBar.AxisType.X, GameObject.Find("axisX").GetComponent<AxisBar>());
-            axis.Add(AxisBar.AxisType.Y, GameObject.Find("axisX").GetComponent<AxisBar>());
-            axis.Add(AxisBar.AxisType.Z, GameObject.Find("axisX").GetComponent<AxisBar>());
+            axis.Add(AxisBar.AxisType.Y, GameObject.Find("axisY").GetComponent<AxisBar>());
+            axis.Add(AxisBar.AxisType.Z, GameObject.Find("axisZ").GetComponent<AxisBar>());
 
+            model = transform.Find("Capsule");
+            logmsg = transform.Find("Message").GetComponent<TextMesh>();
+            logmsg.text = "Step 1. Select a device to connect.";
 
 
 #if WINDOWS_UWP
@@ -47,51 +50,51 @@ namespace Orpe
 #if WINDOWS_UWP
         private void StartOrphe()
         {
-
-            model = transform.Find("Capsule");
-            logmsg = transform.Find("Message").GetComponent<TextMesh>();
-            logmsg.text = "Step 1. Select a device to connect.";
-
-
+            //initialize and setup callback
             OrpheDeviceManager.Instance.Init("orphe6R");
+
             OrpheDeviceManager.Instance.OnDeviceAdded += IdAddedtoUI;
             OrpheDeviceManager.Instance.OnDeviceRemoved += IdRemovedtoUI;
             OrpheDeviceManager.Instance.OnConnected += OnConnected;
             OrpheDeviceManager.Instance.OnConnectFailed += OnConnectFailed;
             OrpheDeviceManager.Instance.OnValueChanged += ValueChanged;
-
-
-
         }
 
         private void OnConnectFailed(string msg)
         {
+            if (OrpheDeviceManager.Instance.isConnected)
+            {
+                logmsg.text = "Alrealdy connected.";
+            }
+            else
+            {
+                logmsg.text = "Failed to connect. Please change the orphe to Pairing-Mode and connect again.";
+            }
+            
 
-
-            logmsg.text = "Orpheとの接続確立に失敗しました。\nOrpheをペアリングモードに変更して再接続してください。";
-            //throw new NotImplementedException();
         }
 
         private void OnConnected(string msg)
         {
-            logmsg.text = "接続に成功しました。：" + msg;
+            logmsg.text = "Success to connect:" + msg;
             // throw new NotImplementedException();
         }
 
         private void ValueChanged(OrpheValueChangedEventArgs e)
         {
-
-
             //  model.localRotation = OrpheDeviceManager.Instance.deviceQ;
             model.localRotation = new Quaternion((float)e.Quaternion.x, (float)e.Quaternion.y, (float)e.Quaternion.z, (float)e.Quaternion.w);
             //  logmsg.text = model.localRotation.ToString();
 
-            float speed = 10;
-            axis[AxisBar.AxisType.X].val = (float)e.Acceleration.x * speed;
-            axis[AxisBar.AxisType.Y].val = (float)e.Acceleration.y * speed;
-            axis[AxisBar.AxisType.Z].val = (float)e.Acceleration.z * speed;
+            float speed = 5;
+            axis[AxisBar.AxisType.X].val = 5 + (float)e.Acceleration.x * speed;
+            axis[AxisBar.AxisType.Y].val = 5 + (float)e.Acceleration.y * speed;
+            axis[AxisBar.AxisType.Z].val = 5 + (float)e.Acceleration.z * speed;
 
-            logmsg.text = "shock" + e.Shock;
+            logmsg.text = "Shock:" + e.Shock;
+            logmsg.text += "\r\nGestureDirection:" + e.GestureDirection.ToString();
+            logmsg.text += "\r\nGestureName:" + e.GestureName.ToString();
+            
 
 
         }
@@ -134,7 +137,7 @@ namespace Orpe
             GameObject g = GameObject.Instantiate(UITextPrefab);
             g.transform.SetParent(transform);
             g.name = text;
-            g.transform.localPosition = new Vector3(0, transform.childCount * -0.3f, 0);
+            g.transform.localPosition = new Vector3(0.2f, transform.childCount * -0.3f, 0);
             g.GetComponent<TextMesh>().text = text;
 
         }
@@ -147,7 +150,8 @@ namespace Orpe
 
         public void IdClicked(string id)
         {
-            Debug.Log("IdClicked:" + id);
+            logmsg.text = "connecting to :" + id + "...";
+          //  Debug.Log("IdClicked:" + id);
 #if WINDOWS_UWP
             OrpheDeviceManager.Instance.btnConnect_Click(id);
 #endif

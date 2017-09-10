@@ -67,7 +67,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1182869508273004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0.2, y: 0, z: 1}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 4145138591428166}
@@ -116,8 +116,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 40.17, y: 4.15, z: 0}
-  m_Center: {x: 18.4, y: -2, z: 0}
+  m_Size: {x: 80, y: 4.15, z: 0}
+  m_Center: {x: 40, y: -2, z: 0}
 --- !u!102 &102769167240878256
 TextMesh:
   serializedVersion: 3
@@ -157,7 +157,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1011002529418032}
   serializedVersion: 5
-  lengthInSec: 5
+  lengthInSec: 0.1
   simulationSpeed: 1
   looping: 1
   prewarm: 0
@@ -255,7 +255,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 9.18
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -764,7 +764,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 12.76
       minScalar: 0
       maxCurve:
         serializedVersion: 2
