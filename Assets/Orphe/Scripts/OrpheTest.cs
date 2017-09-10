@@ -21,41 +21,106 @@ namespace Orpe
         public GameObject UITextPrefab;
         bool isInit = false;
 
-#if WINDOWS_UWP
+        private Transform model;
+        private TextMesh logmsg;
+
+        private Dictionary<AxisBar.AxisType, AxisBar> axis;
+
+
         private void Start()
         {
-            //  OrpheDeviceManager.Instance.addCallback(TestCallBack);
-            OrpheDeviceManager.Instance.Init();
+            axis = new Dictionary<AxisBar.AxisType, AxisBar>();
+
+
+            axis.Add(AxisBar.AxisType.X, GameObject.Find("axisX").GetComponent<AxisBar>());
+            axis.Add(AxisBar.AxisType.Y, GameObject.Find("axisX").GetComponent<AxisBar>());
+            axis.Add(AxisBar.AxisType.Z, GameObject.Find("axisX").GetComponent<AxisBar>());
+
+
+
+#if WINDOWS_UWP
+            StartOrphe();
+#endif
+        }
+
+
+#if WINDOWS_UWP
+        private void StartOrphe()
+        {
+
+            model = transform.Find("Capsule");
+            logmsg = transform.Find("Message").GetComponent<TextMesh>();
+            logmsg.text = "Step 1. Select a device to connect.";
+
+
+            OrpheDeviceManager.Instance.Init("orphe6R");
             OrpheDeviceManager.Instance.OnDeviceAdded += IdAddedtoUI;
             OrpheDeviceManager.Instance.OnDeviceRemoved += IdRemovedtoUI;
-
+            OrpheDeviceManager.Instance.OnConnected += OnConnected;
+            OrpheDeviceManager.Instance.OnConnectFailed += OnConnectFailed;
             OrpheDeviceManager.Instance.OnValueChanged += ValueChanged;
+
+
 
         }
 
+        private void OnConnectFailed(string msg)
+        {
+
+
+            logmsg.text = "Orpheとの接続確立に失敗しました。\nOrpheをペアリングモードに変更して再接続してください。";
+            //throw new NotImplementedException();
+        }
+
+        private void OnConnected(string msg)
+        {
+            logmsg.text = "接続に成功しました。：" + msg;
+            // throw new NotImplementedException();
+        }
 
         private void ValueChanged(OrpheValueChangedEventArgs e)
         {
-            Debug.Log(e.Quaternion);
+
+
+            //  model.localRotation = OrpheDeviceManager.Instance.deviceQ;
+            model.localRotation = new Quaternion((float)e.Quaternion.x, (float)e.Quaternion.y, (float)e.Quaternion.z, (float)e.Quaternion.w);
+            //  logmsg.text = model.localRotation.ToString();
+
+            float speed = 10;
+            axis[AxisBar.AxisType.X].val = (float)e.Acceleration.x * speed;
+            axis[AxisBar.AxisType.Y].val = (float)e.Acceleration.y * speed;
+            axis[AxisBar.AxisType.Z].val = (float)e.Acceleration.z * speed;
+
+            logmsg.text = "shock" + e.Shock;
+
+
         }
-#endif
-        private void TestCallBack(string msg)
+
+        private void OnDestroy()
         {
-            Debug.Log("TestCallBack:done:" + msg);
+            OrpheDeviceManager.Instance.Init("orphe6R");
+            OrpheDeviceManager.Instance.OnDeviceAdded -= IdAddedtoUI;
+            OrpheDeviceManager.Instance.OnDeviceRemoved -= IdRemovedtoUI;
+            OrpheDeviceManager.Instance.OnConnected -= OnConnected;
+            OrpheDeviceManager.Instance.OnConnectFailed -= OnConnectFailed;
+            OrpheDeviceManager.Instance.OnValueChanged -= ValueChanged;
         }
+
+
+#endif
 
         // Update is called once per frame
         void Update()
         {
             // Debug.Log("Update");
-
-            isInit = true;
+#if !WINDOWS_UWP
             if (Input.GetKeyUp(KeyCode.Space))
             {
                 //   Debug.Log("isPrepared");
                 //isPrepare = true;
                 IdAddedtoUI("hoge");
             }
+#endif
         }
         public void IdAddedtoUI(string text)
         {
@@ -87,5 +152,6 @@ namespace Orpe
             OrpheDeviceManager.Instance.btnConnect_Click(id);
 #endif
         }
+
     }
 }

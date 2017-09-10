@@ -20,10 +20,11 @@ namespace Orpe
 {
     public class OrpheDeviceManager : Singleton<OrpheDeviceManager>
     {
-
-
+        public Quaternion deviceQ;
 
 #if WINDOWS_UWP
+
+        bool isConnected = false;
         // delegateの宣言
         public delegate void MyCallback(string msg);
         public delegate void MyValueCallback(OrpheValueChangedEventArgs e);
@@ -32,6 +33,8 @@ namespace Orpe
         public MyCallback OnDeviceAdded;
         public MyCallback OnDeviceRemoved;
         public MyCallback OnDeviceUpdated;
+        public MyCallback OnConnected;
+        public MyCallback OnConnectFailed;
         public MyValueCallback OnValueChanged;
 
         private OrpheShoe _OrpheShoe = null;
@@ -41,23 +44,17 @@ namespace Orpe
 
 
         // Use this for initialization
-        public void Init()
+        public void Init(string deviceName = "orphe")
         {
             Debug.Log("init");
-
-            _DeviceWatcher = DeviceInformation.CreateWatcher(OrpheShoe.GetDeviceSelector("orphe6R"), new string[] { "System.Devices.Aep.IsConnected", "System.Devices.Aep.SignalStrength", }, DeviceInformationKind.AssociationEndpoint);
+            isConnected = false;
+            _DeviceWatcher = DeviceInformation.CreateWatcher(OrpheShoe.GetDeviceSelector(deviceName), new string[] { "System.Devices.Aep.IsConnected", "System.Devices.Aep.SignalStrength", }, DeviceInformationKind.AssociationEndpoint);
             //_DeviceWatcher = DeviceInformation.CreateWatcher("System.Devices.Aep.ProtocolId:=\"{bb7bb05e-5972-42b5-94fc-76eaa7084d49}\"", null, DeviceInformationKind.AssociationEndpoint);
             _DeviceWatcher.Added += DeviceWatcher_Added;
             _DeviceWatcher.Updated += DeviceWatcher_Updated;
             _DeviceWatcher.Removed += DeviceWatcher_Removed;
             _DeviceWatcher.Start();
-            /*
-            _DeviceWatcher = DeviceInformation.CreateWatcher("System.Devices.Aep.ProtocolId:=\"{bb7bb05e-5972-42b5-94fc-76eaa7084d49}\"", null, DeviceInformationKind.AssociationEndpoint);
-            _DeviceWatcher.Added += DeviceWatcher_Added;
-            _DeviceWatcher.Updated += DeviceWatcher_Updated;
-            _DeviceWatcher.Removed += DeviceWatcher_Removed;
-            _DeviceWatcher.Start();
-            */
+
 
         }
 
@@ -79,20 +76,22 @@ namespace Orpe
             //   gameObject.SendMessage("IdAddedtoUI", args.Id);
 
             // Debug.Log("DeviceWatcher_Added:end");
-            Task.Run(async () => {
-                UnityEngine.WSA.Application.InvokeOnAppThread(() => {
+            Task.Run(async () =>
+            {
+                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                {
                     OnDeviceAdded(args.Id);
                 }, true);
 
             });
-   
+
         }
 
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
             Debug.Log("DeviceWatcher_Updated" + args.Id);
 
-            
+
         }
 
         private async void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
@@ -101,10 +100,12 @@ namespace Orpe
             Debug.Log("DeviceWatcher_Removed" + args.Id);
             _DeviceIdList.Remove(args.Id);
             //   gameObject.SendMessage("IdRemovedtoUI", args.Id);
-            
 
-            Task.Run(async () => {
-                UnityEngine.WSA.Application.InvokeOnAppThread(() => {
+
+            Task.Run(async () =>
+            {
+                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                {
                     OnDeviceRemoved(args.Id);
                 }, true);
 
@@ -115,39 +116,63 @@ namespace Orpe
 
         public async void btnConnect_Click(string deviceID)
         {
+            if (isConnected)
+            {
+                Debug.Log("すでに接続済み");
+                return;
+            }
+                
 
             _OrpheShoe = new OrpheShoe();
             _OrpheShoe.ValueChanged += OrpheShoe_ValueChanged;
+
             if (!await _OrpheShoe.Connect(deviceID))
             {
                 _OrpheShoe = null;
 
+
                 Debug.Log("Orpheとの接続確立に失敗しました。\nOrpheをペアリングモードに変更して再接続してください。");
-               /// await new MessageDialog("Orpheとの接続確立に失敗しました。\nOrpheをペアリングモードに変更して再接続してください。").ShowAsync();
+                Task.Run(async () =>
+                {
+                    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                    {
+                        OnConnectFailed(deviceID);
+                    }, true);
+
+                });
+                /// await new MessageDialog("Orpheとの接続確立に失敗しました。\nOrpheをペアリングモードに変更して再接続してください。").ShowAsync();
                 return;
             }
 
             _DeviceWatcher.Stop();
 
             Debug.Log("Connected!");
+            Task.Run(async () =>
+            {
+                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                {
+                    OnConnected(deviceID);
+                }, true);
+
+            });
 
 
         }
 
         private void OrpheShoe_ValueChanged(object sender, OrpheValueChangedEventArgs e)
         {
-            //Debug.Log("OrpheShoe_ValueChanged");
-            //var now = DateTime.Now;
+            Debug.Log("OrpheShoe_ValueChanged");
+            deviceQ = new Quaternion((float)e.Quaternion.x, (float)e.Quaternion.y, (float)e.Quaternion.z, (float)e.Quaternion.w);
+            
 
-            Task.Run(async () => {
-                UnityEngine.WSA.Application.InvokeOnAppThread(() => {
+            Task.Run(async () =>
+            {
+                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                {
                     OnValueChanged(e);
                 }, true);
 
             });
-
-            //Debug.LogFormat
-        //    Debug.LogFormat("{0:HHmmssfff} {1:f3} {2:f3} {3:f3}", now, e.Quaternion.x, e.Quaternion.y, e.Quaternion.z);
         }
 
 
