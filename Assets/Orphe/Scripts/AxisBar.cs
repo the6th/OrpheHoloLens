@@ -19,19 +19,23 @@ public class AxisBar : MonoBehaviour {
         {
             case AxisType.X:
                 mat.SetColor("_Color", Color.red);
-                rotAxis = Vector3.forward.normalized;
-                unitAxis = Vector3.right.normalized;
-                
+                rotAxis = Vector3.up.normalized;
+                unitAxis = Vector3.up.normalized;
+               
                 break;
             case AxisType.Y:
                 mat.SetColor("_Color", Color.green);
-                rotAxis = Vector3.up.normalized;
-                unitAxis = Vector3.up.normalized;
+                rotAxis = Vector3.right.normalized;
+                unitAxis = Vector3.forward.normalized;
+
                 break;
             case AxisType.Z:
                 mat.SetColor("_Color", Color.blue);
-                rotAxis = Vector3.right.normalized;
-                unitAxis = Vector3.forward.normalized;
+                rotAxis = Vector3.forward.normalized;
+                unitAxis = Vector3.right.normalized;
+
+
+
                 break;
             default:
                 break;

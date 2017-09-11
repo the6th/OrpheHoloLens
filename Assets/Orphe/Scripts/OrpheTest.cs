@@ -84,6 +84,7 @@ namespace Orpe
         {
             //  model.localRotation = OrpheDeviceManager.Instance.deviceQ;
             model.localRotation = new Quaternion((float)e.Quaternion.x, (float)e.Quaternion.y, (float)e.Quaternion.z, (float)e.Quaternion.w);
+            model.localEulerAngles += new Vector3(-90, 0, 0);
             //  logmsg.text = model.localRotation.ToString();
 
             float speed = 5;
